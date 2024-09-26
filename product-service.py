@@ -47,9 +47,8 @@ def edit_product():
             elif new_product_data.get("flag") == "add":
                 product["quantity"] -= new_product_data.get("quantity")
                 return jsonify({"message": "Product has been updated"}), 200
-
-    else:
-        return jsonify({"message": "Product not found"}), 404
+            else:
+                return jsonify({"message": "Product not found"}), 404
 
     new_product = {
         "id": len(products) + 1,
