@@ -31,24 +31,39 @@ def get_products_by_product_id(product_id):
     else:
         return jsonify({"message": "Product not found"}), 404
 
-
-@app.route('/products', methods= ["POST"])
-def add_product():
+@app.route('/products', methods=["POST"])
+def edit_product():
     new_product_data = request.get_json()
-    
+
     if not new_product_data:
         return jsonify({"message": "Invalid request data"}), 400
-    
+
+    product_id = new_product_data.get("id")
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if product:
+        flag = new_product_data.get("flag")
+        quantity_change = new_product_data.get("quantity", 0)
+
+        if flag == "remove":
+            product["quantity"] += quantity_change
+            return jsonify({"message": "Product quantity has been updated"}), 200
+        elif flag == "add":
+            product["quantity"] -= quantity_change
+            return jsonify({"message": "Product quantity has been updated"}), 200
+        else:
+            return jsonify({"message": "Invalid flag provided"}), 400
+
     new_product = {
         "id": len(products) + 1,
         "name": new_product_data.get("name"),
-        "price": new_product_data.get("price"), 
-        "quantity": new_product_data.get("quantity")
+        "price": new_product_data.get("price"),
+        "quantity": new_product_data.get("quantity", 0)
     }
-
+    
     products.append(new_product)
     return jsonify({"message": "New product has been added", "product": new_product}), 201
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=4000, debug=True)
